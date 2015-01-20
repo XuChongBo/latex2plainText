@@ -53,10 +53,18 @@ void ConvertString(const char *string)
 {
     if (string == NULL || string == '\0')
         return;
+
+    diagnostics(5, "Entering Convert() from ConvertString()");
+
     if (PushSource(string) == 0) {
         while (StillSource())
             Convert();
     }
+
+    PopSource();
+
+    diagnostics(5, "Exiting Convert() from ConvertString()");
+
 }
 
 
@@ -460,27 +468,27 @@ purpose: converts inputfile and writes result to outputfile
                 break;
 
             default:
-                if (getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH) {
-                    if (('a' <= cThis && cThis <= 'z') || ('A' <= cThis && cThis <= 'Z')) {
-                        // if (CurrentFontSeries() == F_SERIES_BOLD)    /* do not italicize */
-                        //     fprintRTF("%c", cThis);
-                        // else if (CurrentFontShape() == F_SHAPE_MATH_UPRIGHT)
-                        //     fprintRTF("%c", cThis);
-                        // else
-                            fprintRTF("{\\i %c}", cThis);
-                    } else
+                // if (getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH) {
+                //     if (('a' <= cThis && cThis <= 'z') || ('A' <= cThis && cThis <= 'Z')) {
+                //         // if (CurrentFontSeries() == F_SERIES_BOLD)    /* do not italicize */
+                //         //     fprintRTF("%c", cThis);
+                //         // else if (CurrentFontShape() == F_SHAPE_MATH_UPRIGHT)
+                //         //     fprintRTF("%c", cThis);
+                //         // else
+                //             fprintRTF("{\\i %c}", cThis);
+                //     } else
                         fprintRTF("%c", cThis);
                 
 
-                } else {
-                    // if (getTexMode()==MODE_VERTICAL) 
-                    //     changeTexMode(MODE_HORIZONTAL);
+                // } else {
+                //     // if (getTexMode()==MODE_VERTICAL) 
+                //     //     changeTexMode(MODE_HORIZONTAL);
                         
-                    // if (CurrentFontEncoding() != ENCODING_OT2)
-                    //     fprintRTF("%c", cThis);
-                    // else
-                    //     CmdOT2Transliteration(cThis);
-                }
+                //     // if (CurrentFontEncoding() != ENCODING_OT2)
+                //     //     fprintRTF("%c", cThis);
+                //     // else
+                //     //     CmdOT2Transliteration(cThis);
+                // }
                 break;
         }
 

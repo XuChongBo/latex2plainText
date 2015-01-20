@@ -1183,9 +1183,10 @@ static void simpleRTFScript(int super)
 
 	// if (getTexMode()==MODE_VERTICAL) changeTexMode(MODE_HORIZONTAL);
     s=getBraceParam();
-    fprintRTF("{\\%s%d\\fs%d ", super ? "up" : "dn", script_shift(), script_size());
+
+    //fprintRTF("{\\%s%d\\fs%d ", super ? "up" : "dn", script_shift(), script_size());
     ConvertString(s);
-    fprintRTF("}");
+    //fprintRTF("}");
     free(s);
     
 }

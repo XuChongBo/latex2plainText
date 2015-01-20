@@ -22,7 +22,8 @@
 
 #include "utils.h"
 
-int OUTPUT_ENABLE = FALSE; //TRUE;
+//int OUTPUT_ENABLE = FALSE; //TRUE;
+int OUTPUT_ENABLE = TRUE; 
 
 extern int RecursionLevel;
 extern int BraceLevel;
@@ -158,7 +159,7 @@ purpose: Writes the message to stderr depending on debugging level
         return;
     }
     static int first = TRUE;
-    int g_verbosity_level = 6;
+    int g_verbosity_level = 2;
     char buffer[512], *buff_ptr;
     va_list apf;
     int i;

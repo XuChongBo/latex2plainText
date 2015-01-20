@@ -42,7 +42,7 @@ static CaseStruct cases[] = {
 
 
     /* bad cases */
-    {"\\frac{1}{2}\\end{equation}", ""},
+    //{"\\frac{1}{2}\\end{equation}", ""},
     {NULL, NULL}
 };   
 
@@ -62,44 +62,29 @@ int main(int argc, char **argv)
     setPackageBabel(g_package_babel);
     */ 
 
-    //char t[]=;
-    //char t[]=;
-    //char t[]=;
-    //char t[]=;
-    //char t[]=;
-    //char t[]="\\sqrt{100}";
-
-    //char t[]="2+3";
-
 
     diagnostics(2, "begin");
     //ConvertString("\\begin{equation}");
     
+    if (0){
+        char t[]="x^3+123";
+        ConvertString(t);
+        fprintf(stdout,"%s\n",output_str);
+    }else {
+            /* do batch test */
+        CaseStruct *p=cases;
+        while(p->latexEq ){
+            ConvertString(p->latexEq);
+            fprintf(stderr, "\ntest convert   %s =>> %s \n", p->latexEq, output_str);
+            //fprintf(stdout,"%s\n",output_str);
+            output_str_len=0;
+            p++;
+        }
 
-
-    /* do batch test */
-    CaseStruct *p=cases;
-
-    while(p->latexEq)
-    {
-
-        
-
-        ConvertString(p->latexEq);
-        fprintf(stderr, "\ntest convert   %s  out: %s \n", p->latexEq, output_str);
-
-        //fprintf(stdout,"%s\n",output_str);
-        output_str_len=0;
-
-        p++;
     }
-
 
     //ConvertString("\\end{equation}");
     diagnostics(2, "end\n");
-
-    
-
     return 0;
 }
 

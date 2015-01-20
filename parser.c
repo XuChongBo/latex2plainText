@@ -45,9 +45,9 @@ typedef struct InputStackType {
 #define PARSER_SOURCE_MAX 100
 #define SCAN_BUFFER_SIZE   5000
 
-//static InputStackType g_parser_stack[PARSER_SOURCE_MAX];
+static InputStackType g_parser_stack[PARSER_SOURCE_MAX];
 
-//static int g_parser_depth = -1;    //point the current record  in g_parser_stack.    [0, ..]
+static int g_parser_depth = -1;    //point the current record  in g_parser_stack.    [0, ..]
 static char *g_parser_string = "stdin";
 
 //static FILE *g_parser_file = NULL;
@@ -69,7 +69,34 @@ int PushSource(const char *string)
 
 {
 
+    // char *name = NULL;
+    // int i;
+    // int line = 1;
+
+
+
+    /* save current values for linenumber and string */
+    if (g_parser_depth >= 0) {
+        //g_parser_stack[g_parser_depth].file_line = g_parser_line;
+        g_parser_stack[g_parser_depth].string = g_parser_string;
+    }
+
+
+
+    g_parser_depth++;
+
+    if (g_parser_depth >= PARSER_SOURCE_MAX)
+        diagnostics(ERROR, "More than %d PushSource() calls", (int) PARSER_SOURCE_MAX);
+
     g_parser_string = (string) ? strdup(string) : NULL;
+    g_parser_stack[g_parser_depth].string = g_parser_string;
+    g_parser_stack[g_parser_depth].string_start = g_parser_string;
+    // g_parser_stack[g_parser_depth].file = p;
+    // g_parser_stack[g_parser_depth].file_line = line;
+    // g_parser_stack[g_parser_depth].file_name = name;
+
+    g_parser_string = g_parser_stack[g_parser_depth].string;
+
     return 0;
 }
 
@@ -83,6 +110,50 @@ int StillSource(void)
     return (*g_parser_string != '\0');
 }
 
+
+void PopSource(void)
+
+/***************************************************************************
+ purpose:     return to the previous source 
+****************************************************************************/
+{
+    // char s[50];
+    // int i;
+
+    if (g_parser_depth < 0) {
+        diagnostics(1, "Hmmm.  More PopSource() calls than PushSource() calls");
+        return;
+    }
+
+
+
+    if (g_parser_string) {
+        // if (strlen(g_parser_stack[g_parser_depth].string_start) < 49)
+        //     strcpy(s, g_parser_stack[g_parser_depth].string_start);
+        // else {
+        //     strncpy(s, g_parser_stack[g_parser_depth].string_start, 49);
+        //     s[49] = '\0';
+        // }
+
+        // show_string(5, s, "closing");
+        free(g_parser_stack[g_parser_depth].string_start);
+        g_parser_stack[g_parser_depth].string_start = NULL;
+    }
+
+    g_parser_depth--;
+
+    if (g_parser_depth >= 0) {
+        g_parser_string = g_parser_stack[g_parser_depth].string;
+        // g_parser_file = g_parser_stack[g_parser_depth].file;
+    }
+
+
+    diagnostics(5, "Resuming Source string");
+        //show_string(5,g_parser_string,"resuming");
+    
+
+}
+
 char getRawTexChar(void)
 
 /***************************************************************************
@@ -94,7 +165,8 @@ char getRawTexChar(void)
 {
     int thechar;
 
-   
+
+
 
         if (g_parser_string && *g_parser_string) {
             thechar = *g_parser_string;
@@ -116,6 +188,10 @@ char getRawTexChar(void)
 
             g_parser_currentChar = thechar;
             g_parser_string++;
+        } else if (g_parser_depth > 15) 
+        {
+             PopSource();    /* go back to parsing parent */
+             g_parser_currentChar = getRawTexChar();  /* get next char from parent file */
         } else {
             g_parser_currentChar = '\0';
 

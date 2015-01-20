@@ -12,6 +12,7 @@
 char    *CurrentFileName(void);
 int     PushSource(const char * string);
 int     StillSource(void);
+void    PopSource(void);
 
 char    getRawTexChar(void);
 char    getTexChar(void);

@@ -27,6 +27,7 @@ Authors:
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "convert.h"
 #include "commands.h"
 #include "stack.h"
@@ -555,8 +556,8 @@ static void SlurpEquation(int code, char **pre, char **eq, char **post)
 /******************************************************************************
  purpose   : Insert equation as latex 
  ******************************************************************************/
-static void WriteEquationAsLatex(int true_code, int inline_equation, const char *pre, const char *eq, const char *post)
-{
+// static void WriteEquationAsLatex(int true_code, int inline_equation, const char *pre, const char *eq, const char *post)
+// {
 	// if (inline_equation) {
 	// 	fprintRTF("$");
 	// 	putRtfStrEscaped(eq);
@@ -582,7 +583,7 @@ static void WriteEquationAsLatex(int true_code, int inline_equation, const char 
 	// 	fprintRTF("\\\\]");
 	// 	free(eq1);
 	// }
-}
+//}
 
 /******************************************************************************
  purpose   : search an equation and determine the first label that appears
@@ -689,7 +690,7 @@ static void WriteEquationAsLatex(int true_code, int inline_equation, const char 
  ******************************************************************************/
 void CmdEquation(int code)
 {
-    int inline_equation;
+    //int inline_equation;
     //int  number
     int true_code;
     char *pre  = NULL;
@@ -697,7 +698,7 @@ void CmdEquation(int code)
     char *post = NULL;
 
     true_code = code & ~ON;
-    diagnostics(3, "CmdEquation[Beginning] code=%d", code);
+    diagnostics(2, "->CmdEquation code=%d", code);
 
     if (!(code & ON || code==EQN_ENSUREMATH))
         return;
@@ -707,12 +708,12 @@ void CmdEquation(int code)
     else
         SlurpEquation(code, &pre, &eq, &post);
 
-    diagnostics(4, "CmdEquation --------%x\n<%s>\n<%s>\n<%s>", code, pre, eq, post);
-
-    inline_equation = (true_code == EQN_MATH) || 
-                      (true_code == EQN_DOLLAR) || 
-                      (true_code == EQN_RND_OPEN) ||
-                      (true_code == EQN_ENSUREMATH);
+    diagnostics(3, "in CmdEquation() --------%x\n<%s>\n<%s>\n<%s>", code, pre, eq, post);
+    ConvertString(eq);
+    // inline_equation = (true_code == EQN_MATH) || 
+    //                   (true_code == EQN_DOLLAR) || 
+    //                   (true_code == EQN_RND_OPEN) ||
+    //                   (true_code == EQN_ENSUREMATH);
 
     //number = getCounter("equation");
 
@@ -727,8 +728,9 @@ void CmdEquation(int code)
     //     WriteEquationAsComment(pre, eq, post);
 
     //if (g_equation_raw_latex) 
-    if (1) 
-        WriteEquationAsLatex(true_code, inline_equation, pre, eq, post);
+    // if (1) 
+    //     WriteEquationAsLatex(true_code, inline_equation, pre, eq, post);
+
 
     /* bitmap versions of equations */
   //   if (( inline_equation && g_equation_inline_bitmap ) || (!inline_equation && g_equation_display_bitmap))   
@@ -743,11 +745,11 @@ void CmdEquation(int code)
     // }
 
 /* balance \begin{xxx} with \end{xxx} call */
-    if (true_code == EQN_MATH     || true_code == EQN_DISPLAYMATH   ||
-        true_code == EQN_EQUATION || true_code == EQN_EQUATION_STAR ||
-        true_code == EQN_ARRAY    || true_code == EQN_ARRAY_STAR    ||
-        true_code == EQN_ALIGN    || true_code == EQN_ALIGN_STAR)
-        ConvertString(post);
+    // if (true_code == EQN_MATH     || true_code == EQN_DISPLAYMATH   ||
+    //     true_code == EQN_EQUATION || true_code == EQN_EQUATION_STAR ||
+    //     true_code == EQN_ARRAY    || true_code == EQN_ARRAY_STAR    ||
+    //     true_code == EQN_ALIGN    || true_code == EQN_ALIGN_STAR)
+    //     ConvertString(post);
 
     free(pre);
     free(eq);
@@ -796,12 +798,16 @@ void CmdRoot(int code)
     //     fprintRTF(")");
     // } else {
         if (power && strlen(power) > 0) {
-            fprintRTF("{\\up%d\\fs%d ", script_shift(), script_size());
+            //fprintRTF("{\\up%d\\fs%d ", script_shift(), script_size());
             ConvertString(power);
-            fprintRTF("}");
+            //fprintRTF("}");
         }
         //ConvertString("\\surd");
-        fprintRTF("gou");
+        //fprintRTF("gou");
+        appendToOutputStr((char)0xe2);
+        appendToOutputStr((char)0x88);
+        appendToOutputStr((char)0x9a);
+
         ConvertString(root);
         //fprintRTF(")");
     //}
@@ -838,11 +844,11 @@ void CmdFraction(int code)
     //     ConvertString(dptr);
     //     fprintRTF(")");
     // } else {
-        fprintRTF(" ");
+        //fprintRTF(" ");
         ConvertString(nptr);
         fprintRTF("/");
         ConvertString(dptr);
-        fprintRTF(" ");
+        //fprintRTF(" ");
     //}
 
     free(nptr);
@@ -1089,15 +1095,44 @@ parameter: type of operand
         //         diagnostics(ERROR, "Illegal code to CmdIntegral");
         // }
 
+        switch (code) {
+            case 0:
+                //CmdUnicodeChar(8747); /* integral */
+                appendToOutputStr((char)0xe2);
+                appendToOutputStr((char)0x88);
+                appendToOutputStr((char)0xab);
+                break;
+            case 1:
+                appendToOutputStr((char)0xe2);
+                appendToOutputStr((char)0x88);
+                appendToOutputStr((char)0x91);
+                break;
+            case 2:
+                //CmdUnicodeChar(8719); /* product */
+                break;
+            case 3:  /* \iint  */
+                //CmdUnicodeChar(8747); /* integral */
+                //CmdUnicodeChar(8747); /* integral */
+                break;
+            case 4:  /* \iiint  */
+                //CmdUnicodeChar(8747); /* integral */
+                //CmdUnicodeChar(8747); /* integral */
+                //CmdUnicodeChar(8747); /* integral */
+                break;
+                
+            default:
+                diagnostics(ERROR, "Illegal code to CmdIntegral");
+        }
+
         if (lower_limit) {
-            fprintRTF("{\\dn%d\\fs%d ", script_shift(), script_size());
+            //fprintRTF("{\\dn%d\\fs%d ", script_shift(), script_size());
             ConvertString(lower_limit);
-            fprintRTF("}");
+            //fprintRTF("}");
         }
         if (upper_limit) {
-            fprintRTF("{\\up%d\\fs%d ", script_shift(), script_size());
+            //fprintRTF("{\\up%d\\fs%d ", script_shift(), script_size());
             ConvertString(upper_limit);
-            fprintRTF("}");
+            //fprintRTF("}");
         }
    // }
 

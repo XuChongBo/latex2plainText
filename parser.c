@@ -74,7 +74,7 @@ int PushSource(const char *string)
     // int line = 1;
 
 
-
+    diagnostics(2, "PushSource");
     /* save current values for linenumber and string */
     if (g_parser_depth >= 0) {
         //g_parser_stack[g_parser_depth].file_line = g_parser_line;
@@ -119,7 +119,7 @@ void PopSource(void)
 {
     // char s[50];
     // int i;
-
+    diagnostics(2, "PopSource");
     if (g_parser_depth < 0) {
         diagnostics(1, "Hmmm.  More PopSource() calls than PushSource() calls");
         return;

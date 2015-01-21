@@ -23,6 +23,7 @@ This file is available from http://sourceforge.net/projects/latex2rtf/
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "stack.h"
 #include "utils.h"
 #include "convert.h"
@@ -49,6 +50,21 @@ static int ret = 0;
 
 static void TranslateCommand(void);
 
+int isConvertOK=TRUE;
+
+// the user takes the responsibility of the memorys. 
+int ConvertTheEquationString(const char *src, char *dst)
+{
+    isConvertOK = TRUE;
+
+    g_output_str_ptr = dst;
+    *g_output_str_ptr = '\0';
+    ConvertString(src);
+
+    return isConvertOK;
+}
+
+
 void ConvertString(const char *string)
 {
     if (string == NULL || string == '\0')
@@ -61,6 +77,7 @@ void ConvertString(const char *string)
             Convert();
     }
 
+    //resume the previous string
     PopSource();
 
     diagnostics(5, "Exiting Convert() from ConvertString()");
@@ -91,17 +108,17 @@ purpose: converts inputfile and writes result to outputfile
     int count;
     int g_tab_counter=0;
 
-    diagnostics(3, "Entering Convert ret = %d", ret);
+    diagnostics(2, "->Convert()  the gloabl ret = %d", ret);
     RecursionLevel++;
     PushLevels();
 
     while ((cThis = getTexChar()) && cThis != '\0') {
 
         if (cThis == '\n')
-            diagnostics(6, "Current character is '\\n' mode = %d ret = %d level = %d", getTexMode(), ret,
+            diagnostics(2, "in Convert().  Current character is '\\n' mode = %d ret = %d level = %d", getTexMode(), ret,
               RecursionLevel);
         else
-            diagnostics(6, "Current character is '%c' mode = %d ret = %d level = %d", cThis, getTexMode(), ret,
+            diagnostics(2, "in Convert().  Current character is '%c' mode = %d ret = %d level = %d", cThis, getTexMode(), ret,
               RecursionLevel);
 
         typedef unsigned char   uint8_t;     //无符号8位数
@@ -111,36 +128,79 @@ purpose: converts inputfile and writes result to outputfile
         typedef unsigned int    uint16_t;    //无符号16位数
         /* preliminary support for utf8 sequences.  Thanks to CSH */
         //if ((cThis & 0x8000) && (CurrentFontEncoding() == ENCODING_UTF8)) {
-        if ((cThis & 0x8000) && 0) {
+        
+        //check if the byte lead an unicode.
+        if ((cThis & 0x8000) ) {
             uint8_t byte;
-            uint16_t len, value, i;
+            // uint16_t len, value, i;
 
             /* Get the number of bytes in the sequence        */
             /* Must use an unsigned character for comparisons */
+            // byte = cThis;
+            // len = 0;
+            // value = 0;
+
+            // 1字节 0xxxxxxx                    same as asci code.
+            // 2字节 110xxxxx 10xxxxxx                        --- 0xC0
+            // 3字节 1110xxxx 10xxxxxx 10xxxxxx               --- 0xE0
+            // 4字节 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx      --- 0xF0
+            // 5字节 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx    --- 0xF8
+            // 6字节 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx    --- 0xFC
+            //
+            // if (byte >= 0xFC) { 
+            //     len = 5; 
+            //     value = byte & ~0xFC; 
+            // } 
+            // else if (byte >= 0xF8) { 
+            //     len = 4; 
+            //     value = byte & ~0xF8; 
+            // } 
+            // else if (byte >= 0xF0) { 
+            //     len = 3; 
+            //     value = byte & ~0xF0; 
+            // } 
+            // else if (byte >= 0xE0) { 
+            //     len = 2; 
+            //     value = byte & ~0xE0; 
+            // }       
+            // else if (byte >= 0xC0) { 
+            //     len = 1; 
+            //     value = byte & ~0xC0; 
+            // }
+            
+            // /* reassemble the character */
+            // for ( i=0; i<len; i++) {
+            //     byte = getTexChar() & ~0xC0;
+            //     value = (value << 6) + byte;
+            // }
+
             byte = cThis;
-            len = 0;
-            value = 0;
-            if (byte >= 0xF0) { 
+            int len = 0;
+            if (byte >= 0xFC) { 
+                len = 5; 
+            } 
+            else if (byte >= 0xF8) { 
+                len = 4; 
+            } 
+            else if (byte >= 0xF0) { 
                 len = 3; 
-                value = byte & ~0xF0; 
             } 
             else if (byte >= 0xE0) { 
                 len = 2; 
-                value = byte & ~0xE0; 
             }       
             else if (byte >= 0xC0) { 
                 len = 1; 
-                value = byte & ~0xC0; 
             }
-            
-            /* reassemble the character */
-            for ( i=0; i<len; i++) {
-                byte = getTexChar() & ~0xC0;
-                value = (value << 6) + byte;
+            diagnostics(2,"got an unicode char.  (first byte = 0x%X) (occupy %u bytes)", (unsigned char) cThis, len);
+
+            //just rewrite the unicode.
+            appendToOutputStr(cThis);
+            for (int i=0; i<len; i++) {
+                cThis = getTexChar();
+                appendToOutputStr(cThis);
             }
+            cThis=' ';
             
-            diagnostics(4,"(flag = 0x%X) char value = 0X%04X or %u (%u bytes)", (unsigned char) cThis, value, value, len);
-            //CmdUnicodeChar(value);
         }                       
         else
 
@@ -163,7 +223,7 @@ purpose: converts inputfile and writes result to outputfile
             case '{':
                 // if (getTexMode() == MODE_VERTICAL)
                 //     changeTexMode(MODE_HORIZONTAL);
-
+                isConvertOK=FALSE;
                 CleanStack();
                 PushBrace();
                 fprintRTF("{");
@@ -182,16 +242,16 @@ purpose: converts inputfile and writes result to outputfile
                 break;
 
             case ' ':
-                if (getTexMode() == MODE_VERTICAL || getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH)
-                    cThis = cLast;
+                // if (getTexMode() == MODE_VERTICAL || getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH)
+                    cThis = cLast; //just skip the space
 
-                else if (cLast != ' ' && cLast != '\n') {
+                // else if (cLast != ' ' && cLast != '\n') {
 
-                    if (getTexMode() == MODE_RESTRICTED_HORIZONTAL)
-                        fprintRTF("\\~");
-                    else
-                        fprintRTF(" ");
-                }
+                //     if (getTexMode() == MODE_RESTRICTED_HORIZONTAL)
+                //         fprintRTF("\\~");
+                //     else
+                //         fprintRTF(" ");
+                // }
 
                 break;
 
@@ -265,24 +325,24 @@ purpose: converts inputfile and writes result to outputfile
                 break;
 
             case '-':
-                if (getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH)
-                    //CmdUnicodeChar(8722); /* MINUS SIGN */
-                    ;
-                else {
-                    // changeTexMode(MODE_HORIZONTAL);
+                // if (getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH)
+                //     CmdUnicodeChar(8722); /* MINUS SIGN */
+                // else {
+                //     // changeTexMode(MODE_HORIZONTAL);
 
-                    count = getSameChar('-') + 1;
+                //     count = getSameChar('-') + 1;
 
-                    if (count == 1)
-                        fprintRTF("-");
-                    else if (count == 2)
-                        fprintRTF("\\endash ");
-                    else if (count == 3)
-                        fprintRTF("\\emdash ");
-                    else
-                        while (count--)
-                            fprintRTF("-");
-                }
+                //     if (count == 1)
+                //         fprintRTF("-");
+                //     else if (count == 2)
+                //         fprintRTF("\\endash ");
+                //     else if (count == 3)
+                //         fprintRTF("\\emdash ");
+                //     else
+                //         while (count--)
+                //             fprintRTF("-");
+                // }
+                fprintRTF("-");
                 break;
 
             case '|':
@@ -514,7 +574,7 @@ returns: success or not
     cThis = getTexChar();
     mode = getTexMode();
 
-    diagnostics(4, "Beginning TranslateCommand() \\%c", cThis);
+    diagnostics(2, "->TranslateCommand()    cThis = \\%c", cThis);
 
     switch (cThis) {
         case 'a':
@@ -763,27 +823,30 @@ returns: success or not
     }
 
     cCommand[i] = '\0';         /* mark end of string with zero */
-    diagnostics(4, "TranslateCommand() <%s>", cCommand);
+    diagnostics(4, "in TranslateCommand().  got command <%s>", cCommand);
 
     if (i==MAXCOMMANDLEN-1) {
         diagnostics(WARNING, "Skipping absurdly long command <%s>", cCommand);
         return;
     }
 
-    if (i == 0)
+    if (i == 0){
+        diagnostics(4, "in TranslateCommand().  got no command.   return");
         return;
+    }
 
     if (strcmp(cCommand, "begin") == 0) {
-        fprintRTF("{");
+        //fprintRTF("{");
         PushBrace();
     }
 
-    if (CallCommandFunc(cCommand)) {    /* call handling function for command */
+/* call handling function for command */
+    if (CallCommandFunc(cCommand)) {    
         if (strcmp(cCommand, "end") == 0) {
-            diagnostics(4, "before PopBrace()");
+            //diagnostics(4, "before PopBrace()");
             ret = RecursionLevel - PopBrace();
-            diagnostics(4, "after PopBrace(), ret=%d",ret);
-            fprintRTF("}");
+            diagnostics(4, "in TranslateCommand() do PopBrace() for command <end>");
+            //fprintRTF("}");
         }
         return;
     }

@@ -27,6 +27,7 @@ Authors:
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <stdio.h>
 #include "convert.h"
 #include "funct1.h"
 #include "equations.h"
@@ -535,8 +536,8 @@ globals: command-functions have side effects or recursive calls
 {
     int iCommand, iEnv; //,user_def_index;
     //char *macro_string;
-
-    diagnostics(4, "CallCommandFunc seeking <%s> (%d environments to look through)", cCommand, iEnvCount);
+    diagnostics(2, "CallCommandFunc() command = <%s>",cCommand);
+    diagnostics(3, "in CallCommandFunc() cCommand = <%s>  iEnvCount=%d", cCommand, iEnvCount);
 
     // user_def_index = existsDefinition(cCommand);
     // if (user_def_index > -1) {
@@ -566,13 +567,15 @@ globals: command-functions have side effects or recursive calls
                 //     diagnostics(2, "Unknown command '\\%s'", cCommand);
                 // }
 
-                diagnostics(5, "CallCommandFunc Found '%s' iEnvCommand=%d number=%d", Environments[iEnv][iCommand].cmd_name, iEnv, iCommand);
+                diagnostics(3, "CallCommandFunc Found '%s' iEnvCommand=%d number=%d", Environments[iEnv][iCommand].cmd_name, iEnv, iCommand);
+                //call the func
                 (*Environments[iEnv][iCommand].func) ((Environments[iEnv][iCommand].param));
                 return TRUE;    /* Command Function found */
             }
             ++iCommand;
         }
     }
+    diagnostics(2, "<-CallCommandFunc()  not found. command = <%s>",cCommand);
     return FALSE;
 }
 

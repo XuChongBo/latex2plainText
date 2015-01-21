@@ -1,8 +1,4 @@
-#if defined(NOSTDERR)
-#define ERROUT stdout
-#else
-#define ERROUT stderr
-#endif 
+
 
 #include <math.h>
 #include <stdlib.h>
@@ -22,32 +18,52 @@
 
 #include "utils.h"
 
-//int OUTPUT_ENABLE = FALSE; //TRUE;
-int OUTPUT_ENABLE = TRUE; 
+
 
 extern int RecursionLevel;
 extern int BraceLevel;
 
-char output_str[1000];
-int  output_str_len = 0;
+char *g_output_str_ptr = NULL;  // assignment by the user
+
+static int g_log_level = 6;  //0--ERROR 1--WARNING 2-INFO  6-DEBUG 
+
+static FILE *g_log_file = NULL;
+
+void appendToOutputStr(char c)
+{
+    int len = strlen(g_output_str_ptr);
+    //append
+    *(g_output_str_ptr+len) = c;
+    *(g_output_str_ptr+len+1) = '\0';
+
+}
+
 
 void fprintRTF(char *format, ...)
 {
-    // TODO
     int n;
     va_list apf;
+    if(!g_output_str_ptr)
+        return;
+
     va_start(apf, format);
-    output_str[output_str_len]='\0';
-    char *p=output_str;
-    n=vsprintf(p+output_str_len,format,apf);
-    output_str_len+=n;
+    int len = strlen(g_output_str_ptr);
+    n=vsprintf(g_output_str_ptr+len,format,apf);
+
+    //check if ok
+    if(n<0){
+       diagnostics(ERROR, "in fprintRTF");
+       strcpy(g_output_str_ptr,"ERROR");
+       //TODO raise an exception
+    }
+    diagnostics(2, "output <%s>",g_output_str_ptr+len);
     // fprintf(stdout, "output: ");
     // vfprintf(stdout, format, apf);
-    
     //fprintf(stdout,"%s",output_str);
-
     va_end(apf);
 }
+
+
 
 /*
  * Appends src to string dst of size siz (unlike strncat, siz is the
@@ -148,18 +164,31 @@ char *strdup_noendblanks(const char *s)
     return my_strndup(t, (size_t) (p - t + 1));
 }
 
+
+
+//0--ERROR 1--WARNING 2-INFO  6-DEBUG        the default value is 6.
+void setLogLevel(int level)
+{
+    g_log_level = level;
+}
+
+void setLogFile(FILE *log_file)
+{
+    g_log_file = log_file;
+}
 void diagnostics(int level, char *format, ...)
 
 /****************************************************************************
 purpose: Writes the message to stderr depending on debugging level
  ****************************************************************************/
 {
-
-    if(!OUTPUT_ENABLE){
+    if (!g_log_file){
         return;
     }
+
+
     static int first = TRUE;
-    int g_verbosity_level = 2;
+
     char buffer[512], *buff_ptr;
     va_list apf;
     int i;
@@ -168,19 +197,19 @@ purpose: Writes the message to stderr depending on debugging level
 
     va_start(apf, format);
 
-    if (level <= g_verbosity_level) {
+    if (level <= g_log_level) {
 
         //CurrentEnvironmentCount();
 
-        if (!first) fprintf(ERROUT,"\n");
+        if (!first) fprintf(g_log_file,"\n");
         
 
         switch (level) {
-            case 0:
-                fprintf(ERROUT, "[Error]  ");
+            case 0: //ERROR
+                fprintf(g_log_file, "[ERROR]   ");
                 break;
-            case 1:
-                fprintf(ERROUT, "[Warning] ");
+            case 1: //WARNING
+                fprintf(g_log_file, "[WARNING] ");
                 // if (g_RTF_warnings) {
                 //     vsnprintf(buffer, 512, format, apf);
                 //     fprintRTF("{\\plain\\cf2 [latex2rtf:");
@@ -191,32 +220,36 @@ purpose: Writes the message to stderr depending on debugging level
                 //     fprintRTF("]}");
                 // }
                 break;
-            case 5:
-            case 6:
-            case 2:
+            case 2:  //INFO
+                fprintf(g_log_file, "[INFO]    ");
+                break;
             case 3:
+                fprintf(g_log_file, "[DEBUG]   ");
+                break;
+
             case 4:
-                fprintf(ERROUT, "[INFO] RecursionLevel=%d ", RecursionLevel);
+            case 5:
+            case 6: //DEBUG
+                fprintf(g_log_file, "[DEBUG]   Level=%d ", RecursionLevel);
                 for (i = 0; i < BraceLevel; i++)
-                    fprintf(ERROUT, "{");
+                    fprintf(g_log_file, "{");
                 for (i = 8; i > BraceLevel; i--)
-                    fprintf(ERROUT, " ");
+                    fprintf(g_log_file, " ");
 
                 for (i = 0; i < RecursionLevel; i++)
-                    fprintf(ERROUT, "  ");
+                    fprintf(g_log_file, "  ");
                 break;
             default:
                 break;
         }
-        vfprintf(ERROUT, format, apf);
+        vfprintf(g_log_file, format, apf);
         first = FALSE;
     }
     va_end(apf);
 
     if (level == 0) {
-        fprintf(ERROUT, "\n");
-        fflush(ERROUT);
-            
-        exit(EXIT_FAILURE);
+        fprintf(g_log_file, "\n");
+        fflush(g_log_file);
+        //exit(EXIT_FAILURE);   //use exception in other place.
     }
 }

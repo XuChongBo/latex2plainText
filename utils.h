@@ -10,8 +10,12 @@
 typedef enum { FALSE = 0,
               TRUE } boolean;
 #endif
-extern char output_str[];
-extern int  output_str_len;
+
+extern char *g_output_str_ptr;
+extern void appendToOutputStr(char c);
+
+void setLogFile(FILE *log_file);
+void setLogLevel(int level);
 char *  my_strndup(const char *s, size_t n);
 size_t my_strlcat(char *dst, const char *src, size_t siz);
 void diagnostics(int level, char *format, ...);

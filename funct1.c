@@ -29,13 +29,11 @@ Authors:
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+#include <stdio.h>
 #include "convert.h"
 #include "funct1.h"
 #include "commands.h"
 #include "stack.h"
-
-
 
 #include "utils.h"
 
@@ -102,7 +100,7 @@ void CmdIgnore(int code)
 {
 }
 
-void Environment(int code)
+void Environment(int code)  // trigger by \\xxx{document} .  That is the CmdDocument
 
 /******************************************************************************
   purpose: pushes/pops the new environment-commands on/from the stack

@@ -149,7 +149,7 @@ static CommandArray commands[] = {
     // {"grave", CmdGraveChar, 0},
     // {"tilde", CmdTildeChar, 0},
     // {"bar", CmdMacronChar, 0},
-    // {"vec", CmdVecChar, 0},
+    {"vec", CmdVecChar, 0},
     // {"overrightarrow", CmdVecChar, 0},
     // {"dot", CmdDotChar, 0},
     // {"ddot", CmdUmlauteChar, 0},
@@ -311,6 +311,10 @@ static CommandArray commands[] = {
     {"dfrac", CmdFraction, 0},
     {"Frac", CmdFraction, 0},
     {"sqrt", CmdRoot, 0},
+
+    {"log", CmdLog, 0},
+    {"ln", CmdLog, 1},
+
     {"lim", CmdLim, 0},
     {"limsup", CmdLim, 1},
     {"liminf", CmdLim, 2},
@@ -323,6 +327,8 @@ static CommandArray commands[] = {
     {"right", CmdLeftRight, 1},
     {"stackrel", CmdStackrel, 0},
     {"matrix", CmdMatrix, 0},
+
+    
     {"overline",CmdOverLine,0},
     {"rightleftharpoons", CmdArrows, RIGHT_LEFT_HARPOONS},
     // {"psset", CmdPsset, 0},
@@ -371,7 +377,34 @@ static CommandArray commands[] = {
     // { "bibcite",       CmdBibCite,        0 },
     
     // {"usetikzlibrary",CmdTikzlib, 0},
+
+    //********* translate the greek letter to utf8 code  ************/
+    {"alph", CmdSepcialLetterToUTF8, 945},
+    {"beta", CmdSepcialLetterToUTF8, 946},
+    {"pi", CmdSepcialLetterToUTF8, 960},
+    {"gamma", CmdSepcialLetterToUTF8, 947},
+    {"delta", CmdSepcialLetterToUTF8, 948},
+    {"epsilon", CmdSepcialLetterToUTF8, 949},
+    {"mu", CmdSepcialLetterToUTF8, 956},
+    {"nu", CmdSepcialLetterToUTF8, 957},
+    {"rho", CmdSepcialLetterToUTF8, 961},
+    {"sigma", CmdSepcialLetterToUTF8, 963},
+    {"phi", CmdSepcialLetterToUTF8, 966},
+    {"psi", CmdSepcialLetterToUTF8, 968},
+    {"omega", CmdSepcialLetterToUTF8, 969},
+    {"Omega", CmdSepcialLetterToUTF8, 911},
+
+    {"neq", CmdSepcialLetterToUTF8, 0x2260},
+    {"geq", CmdSepcialLetterToUTF8, 0x2264},
+    {"leq", CmdSepcialLetterToUTF8, 0x2265},
     
+
+
+    //********* translate math symbols to utf8 code  ************/
+    {"div", CmdSepcialLetterToUTF8, 0x00F7},
+    {"times", CmdSepcialLetterToUTF8, 0x00D7},
+
+
     {"", NULL, 0}
 };
 
@@ -426,6 +459,9 @@ static CommandArray params[] = {
     {"align*", CmdEquation, EQN_ALIGN_STAR},
     {"align", CmdEquation, EQN_ALIGN},
     {"math", CmdEquation, EQN_MATH},
+
+    {"pmatrix", CmdMatrixOrCases, 0},
+    {"cases", CmdMatrixOrCases, 0},
     // {"tikzpicture",CmdTikzPicture, 0},
 	
 	{"", NULL, 0}

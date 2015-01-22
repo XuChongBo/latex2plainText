@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <ctype.h>
-
+#include <assert.h>
 #ifdef UNIX
 # include <sys/types.h>
 # include <sys/stat.h>
@@ -29,13 +29,17 @@ static int g_log_level = 6;  //0--ERROR 1--WARNING 2-INFO  6-DEBUG
 
 static FILE *g_log_file = NULL;
 
-void appendToOutputStr(char c)
-{
-    int len = strlen(g_output_str_ptr);
-    //append
-    *(g_output_str_ptr+len) = c;
-    *(g_output_str_ptr+len+1) = '\0';
 
+
+void printRTF(char *pstr)
+{
+
+    char *p_out_str = g_output_str_ptr + strlen(g_output_str_ptr);
+    while(*pstr){
+        *p_out_str++ = *pstr++;
+
+    }
+    *p_out_str = '\0';
 }
 
 
@@ -253,3 +257,89 @@ purpose: Writes the message to stderr depending on debugging level
         //exit(EXIT_FAILURE);   //use exception in other place.
     }
 }
+
+
+
+/***************************************************************************** 
+ * translate  one Unicode(UCS-2和UCS-4) letter  to UTF-8 
+ * 
+ * params: 
+ *    unic     Unicode value
+ *    pOutput  point to the result.
+ *    outsize  pOutput buffer size 
+ * 
+ * return: 
+ *    the encode len.    0 stands for error. 
+ * 
+ * Note: 
+ *     1. low bits piror  in unic.
+ *     2. make sure pOutput has 6+1 bytes memory.
+ *
+ * from http://blog.csdn.net/tge7618291/article/details/7599902
+ ****************************************************************************/  
+int unicode_to_utf8(uint32_t unic, unsigned char *pOutput)  
+{  
+    assert(pOutput != NULL);  
+    int nSize = 0;
+    if ( unic <= 0x0000007F )  
+    {  
+        // * U-00000000 - U-0000007F:  0xxxxxxx  
+        *pOutput     = (unic & 0x7F);  
+        nSize = 1;
+
+    }  
+    else if ( unic >= 0x00000080 && unic <= 0x000007FF )  
+    {  
+        // * U-00000080 - U-000007FF:  110xxxxx 10xxxxxx  
+        *(pOutput+1) = (unic & 0x3F) | 0x80;  
+        *pOutput     = ((unic >> 6) & 0x1F) | 0xC0;  
+        nSize = 2;
+
+    }  
+    else if ( unic >= 0x00000800 && unic <= 0x0000FFFF )  
+    {  
+        // * U-00000800 - U-0000FFFF:  1110xxxx 10xxxxxx 10xxxxxx  
+        *(pOutput+2) = (unic & 0x3F) | 0x80;  
+        *(pOutput+1) = ((unic >>  6) & 0x3F) | 0x80;  
+        *pOutput     = ((unic >> 12) & 0x0F) | 0xE0;  
+        nSize = 3;
+ 
+    }  
+    else if ( unic >= 0x00010000 && unic <= 0x001FFFFF )  
+    {  
+        // * U-00010000 - U-001FFFFF:  11110xxx 10xxxxxx 10xxxxxx 10xxxxxx  
+        *(pOutput+3) = (unic & 0x3F) | 0x80;  
+        *(pOutput+2) = ((unic >>  6) & 0x3F) | 0x80;  
+        *(pOutput+1) = ((unic >> 12) & 0x3F) | 0x80;  
+        *pOutput     = ((unic >> 18) & 0x07) | 0xF0;  
+        nSize = 4;
+
+    }  
+    else if ( unic >= 0x00200000 && unic <= 0x03FFFFFF )  
+    {  
+        // * U-00200000 - U-03FFFFFF:  111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx  
+        *(pOutput+4) = (unic & 0x3F) | 0x80;  
+        *(pOutput+3) = ((unic >>  6) & 0x3F) | 0x80;  
+        *(pOutput+2) = ((unic >> 12) & 0x3F) | 0x80;  
+        *(pOutput+1) = ((unic >> 18) & 0x3F) | 0x80;  
+        *pOutput     = ((unic >> 24) & 0x03) | 0xF8;  
+        nSize = 5;
+
+    }  
+    else if ( unic >= 0x04000000 && unic <= 0x7FFFFFFF )  
+    {  
+        // * U-04000000 - U-7FFFFFFF:  1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx  
+        *(pOutput+5) = (unic & 0x3F) | 0x80;  
+        *(pOutput+4) = ((unic >>  6) & 0x3F) | 0x80;  
+        *(pOutput+3) = ((unic >> 12) & 0x3F) | 0x80;  
+        *(pOutput+2) = ((unic >> 18) & 0x3F) | 0x80;  
+        *(pOutput+1) = ((unic >> 24) & 0x3F) | 0x80;  
+        *pOutput     = ((unic >> 30) & 0x01) | 0xFC;  
+        nSize = 6;
+
+    }  
+  
+    *(pOutput+nSize) = '\0';
+    return nSize;  
+}  
+// #c---end  

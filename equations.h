@@ -25,6 +25,10 @@
 #define LONG_RIGHT 8
 #define RIGHT_LEFT_HARPOONS 9
 
+void CmdMatrixOrCases(int code);
+void CmdVecChar(int code);
+void CmdLog(int code);
+void CmdSepcialLetterToUTF8(int code);
 void CmdEquation(int code);
 void CmdFraction(int code);
 void CmdRoot(int code);

@@ -685,6 +685,53 @@ static void SlurpEquation(int code, char **pre, char **eq, char **post)
 // }
 // #endif
 
+
+// code is actually the unicode value.
+// translate the special letter to the utf8
+void CmdSepcialLetterToUTF8(int code)
+{
+    unsigned char utf8_code[7];
+    unicode_to_utf8((uint32_t)code,utf8_code);
+    printRTF((char *)utf8_code);        
+}
+
+void CmdMatrixOrCases(int code)
+
+/******************************************************************************
+ purpose   : Does not handle plain tex \matrix command, but does not
+             produce improper RTF either.
+ ******************************************************************************/
+{
+    char *contents=NULL;
+    if(code == ON){
+        unsigned char utf8_code[7];
+        unicode_to_utf8(0x007b,utf8_code);
+        printRTF((char *)utf8_code); 
+
+    }
+    
+    contents = getBraceParam();
+    ConvertString(contents);
+    free(contents);
+}
+
+/*****************************************************************************
+ purpose: converts \vec{o} from LaTeX to RTF
+ ******************************************************************************/
+void CmdVecChar(int code)
+{
+
+    char *cParam = getBraceParam();
+
+    unsigned char utf8_code[7];
+    unicode_to_utf8(0x20d7,utf8_code);
+    printRTF((char *)utf8_code);
+
+
+    ConvertString(cParam);
+    free(cParam);
+}
+
 /******************************************************************************
  purpose   : Handle everything associated with equations
  ******************************************************************************/
@@ -803,10 +850,9 @@ void CmdRoot(int code)
             //fprintRTF("}");
         }
         //ConvertString("\\surd");
-        //fprintRTF("gou");
-        appendToOutputStr((char)0xe2);
-        appendToOutputStr((char)0x88);
-        appendToOutputStr((char)0x9a);
+
+        char utf8_code[] = {0xe2, 0x88, 0x9a, 0};
+        printRTF(utf8_code);
 
         ConvertString(root);
         //fprintRTF(")");
@@ -977,6 +1023,41 @@ parameter: 0=\lim, 1=\limsup, 2=\liminf
     free(s);
 }
 
+void CmdLog(int code)
+{
+    char *lower_limit = NULL;
+    char cThis;
+
+    diagnostics(4, "Entering CmdIntegral");
+
+    /* is there an subscript ? */
+    cThis = getNonBlank();
+    if (cThis == '_')
+        lower_limit = getBraceParam();
+    else
+        ungetTexChar(cThis);
+
+    
+    switch (code) {
+        case 0:
+            fprintRTF("log");
+            break;
+        case 1:
+            fprintRTF("ln");
+            break;
+            
+        default:
+            diagnostics(ERROR, "in CmdLog Illegal code.");
+    }
+
+    if (lower_limit) {
+        ConvertString(lower_limit);
+    }
+
+    if (lower_limit)
+        free(lower_limit);
+}
+
 void CmdIntegral(int code)
 
 /******************************************************************************
@@ -1095,17 +1176,17 @@ parameter: type of operand
         //         diagnostics(ERROR, "Illegal code to CmdIntegral");
         // }
 
+        unsigned char utf8_code[7]; //= {0xe2, 0x88, 0xab, 0};
         switch (code) {
             case 0:
-                //CmdUnicodeChar(8747); /* integral */
-                appendToOutputStr((char)0xe2);
-                appendToOutputStr((char)0x88);
-                appendToOutputStr((char)0xab);
+                /* integral */
+                unicode_to_utf8(0x222B,utf8_code);
+                printRTF((char *)utf8_code);        
                 break;
             case 1:
-                appendToOutputStr((char)0xe2);
-                appendToOutputStr((char)0x88);
-                appendToOutputStr((char)0x91);
+                /* sum */
+                unicode_to_utf8(0x2211,utf8_code);
+                printRTF((char *)utf8_code);        
                 break;
             case 2:
                 //CmdUnicodeChar(8719); /* product */

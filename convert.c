@@ -121,11 +121,7 @@ purpose: converts inputfile and writes result to outputfile
             diagnostics(2, "in Convert().  Current character is '%c' mode = %d ret = %d level = %d", cThis, getTexMode(), ret,
               RecursionLevel);
 
-        typedef unsigned char   uint8_t;     //无符号8位数
 
-        typedef signed   char   int8_t;      //有符号8位数
-
-        typedef unsigned int    uint16_t;    //无符号16位数
         /* preliminary support for utf8 sequences.  Thanks to CSH */
         //if ((cThis & 0x8000) && (CurrentFontEncoding() == ENCODING_UTF8)) {
         
@@ -194,11 +190,16 @@ purpose: converts inputfile and writes result to outputfile
             diagnostics(2,"got an unicode char.  (first byte = 0x%X) (occupy %u bytes)", (unsigned char) cThis, len);
 
             //just rewrite the unicode.
-            appendToOutputStr(cThis);
-            for (int i=0; i<len; i++) {
+            char utf8_code[7];
+            utf8_code[0]=cThis;
+
+            for (int i=1; i<=len; i++) {
                 cThis = getTexChar();
-                appendToOutputStr(cThis);
+                utf8_code[i]=cThis;
+                
             }
+            utf8_code[len+1] = '\0';
+            printRTF(utf8_code);
             cThis=' ';
             
         }                       
@@ -223,16 +224,16 @@ purpose: converts inputfile and writes result to outputfile
             case '{':
                 // if (getTexMode() == MODE_VERTICAL)
                 //     changeTexMode(MODE_HORIZONTAL);
-                isConvertOK=FALSE;
+                //isConvertOK=FALSE;
                 CleanStack();
                 PushBrace();
-                fprintRTF("{");
+                //fprintRTF("{");
                 break;
 
             case '}':
                 CleanStack();
                 ret = RecursionLevel - PopBrace();
-                fprintRTF("}");
+                //fprintRTF("}");
                 if (ret > 1) {
                     diagnostics(3, "Exiting Convert via '}' ret = %d level = %d", ret, RecursionLevel);
                     ret--;
@@ -425,7 +426,7 @@ purpose: converts inputfile and writes result to outputfile
                 //         fprintRTF("\\'a1 ");
                 //     } else {
                         fprintRTF("!");      /* WH 2014-06-16: Blank removed, was fprintRTF("! ") */
-                        ungetTexChar(cNext);
+                        //ungetTexChar(cNext);
                 //     }
                 // }
                 break;
@@ -623,6 +624,7 @@ returns: success or not
 
         case '\\':     //new line        /* \\[1mm] or \\*[1mm] possible */
             diagnostics(5,"here we are in TranslateCommand with '\\\\'");
+            fprintRTF(" ");
             height = getSlashSlashParam();
             if (g_processing_arrays)            /* \begin{array} ... \end{array} */
                 CmdArraySlashSlash(height);     /* may be contained in eqnarray environment */

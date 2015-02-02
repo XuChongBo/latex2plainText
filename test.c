@@ -10,7 +10,6 @@
 #include "stack.h"
 #include "utils.h"
 
-
 typedef struct CaseStructTag {
     char *latexEq; 
     char *outEq;
@@ -43,6 +42,7 @@ static CaseStruct cases[] = {
     {"\\alph<\\beta",""},
     {"\\alph\\leq\\beta",""},
     {"\\alph\\geq\\beta",""},
+
 
     /* normal */
     {"1+2+y+x+2y", ""},
@@ -135,8 +135,9 @@ static CaseStruct cases[] = {
     /* bad cases which can raise errors.  */
     {"\\sqrt{  \\frac{3 }{4 }  }{2}", ""},
     {"(1,f(x)", ""},
+    {"0≤y≤a",""},
 
-
+    {"$\\sqrt{  \\frac{3 }{4 你}  }{2}$这是两个公式 $\\sqrt{  \\frac{3 }{4 你}  }{2}$", ""},
     {NULL, NULL}
 };   
 
@@ -144,7 +145,6 @@ static CaseStruct cases[] = {
 
 int main(int argc, char **argv)
 {
-
     /* the global initial */
     FILE *log_file = fopen("log.txt", "w");  
     setLogLevel(4);
@@ -167,6 +167,41 @@ int main(int argc, char **argv)
     diagnostics(2, "initial ok.");
     //ConvertString("\\begin{equation}");
     char output_str[10000];
+
+
+    
+    //
+    if(argc>=2){
+         FILE* caseFile = fopen(argv[1], "r");
+         if(caseFile==NULL) {
+            printf("read file error!\n");
+            return -1;
+         }
+        char strLine[1024];  //the buffer for text line.
+        int i=0;
+        while(!feof(caseFile)){
+            fgets(strLine, 1024,caseFile);
+            if(strlen(strLine)<2)
+                continue;
+            //printf("1-%s",strLine);
+            i++;
+            int isOK = ConvertTheEquationString(strLine,output_str);
+            fprintf(stdout, "case %d\n", i);
+            if (isOK){
+                fprintf(stdout, "src: %s\n", strLine);
+                fprintf(stdout, "dst: %s\n\n", output_str);
+
+            }else{
+                fprintf(stdout, "src: %s\n", strLine);
+                fprintf(stdout,"error happens during convert.\n\n");
+            }
+
+
+
+        }
+        fclose(caseFile);
+        return 0;
+    }
 
     if (0){
         char t[]="x^3+123";

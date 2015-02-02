@@ -28,13 +28,12 @@ Authors:
 #include <string.h>
 #include <ctype.h>
 #include <stdio.h>
-#include "convert.h"
 #include "commands.h"
 #include "stack.h"
 #include "parser.h"
 #include "equations.h"
+#include "convert.h"
 #include "utils.h"
-#include "vertical.h"
 //#include "chars.h"
 
 
@@ -1446,7 +1445,8 @@ void CmdLeftRight(int code)
         diagnostics(ERROR, "\\right without opening \\left");
 
     diagnostics(4, "CmdLeftRight() ... \\left <%c> \\right <%c>", ldelim, rdelim);
-      
+    
+    ConvertString(contents);
     // if (fields_use_EQ()) {
 
     //     fprintRTF(" \\\\b ");
@@ -1521,7 +1521,7 @@ void CmdArray(int code)
     char *v_align, *col_align, *s;
     int n = 0;
 
-    if (code & ON) {
+    if (code & ON) {  //for begin{array}
         v_align = getBracketParam();
         col_align = getBraceParam();
         diagnostics(4, "CmdArray() ... \\begin{array}[%s]{%s}", v_align ? v_align : "", col_align);
@@ -1537,14 +1537,15 @@ void CmdArray(int code)
             s++;
         }
  
-        fprintRTF(" \\\\a \\\\a%c \\\\co%d (", *col_align, n);
+       // fprintRTF(" \\\\a \\\\a%c \\\\co%d (", *col_align, n);
+        fprintRTF("{");
         free(col_align);
         if (v_align) free(v_align);
 
         g_processing_arrays++;
 
-    } else {
-        fprintRTF(")");
+    } else {     //for end{array}
+        //fprintRTF(")");
         diagnostics(4, "CmdArray() ... \\end{array}");
         g_processing_arrays--;
     }
@@ -1631,7 +1632,8 @@ void CmdArraySlashSlash(int height)
     char cThis = getNonBlank();
     ungetTexChar(cThis);
     diagnostics(4, "CmdArraySlashSlash height = %d, multiline=%d", height,g_multiline_equation_type);
-    fprintRTF("%c", g_field_separator);
+    //fprintRTF("%c", g_field_separator);
+    fprintRTF(" ");
 }
 
 /***************************************************************************

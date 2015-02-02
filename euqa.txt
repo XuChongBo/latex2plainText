@@ -1,0 +1,44 @@
+﻿$\left\{\begin{array}{l}{y≤2x}\\{y≥-2x}\\{x≤3}\end{array}\right.$
+$\left\{\begin{array}{l}-x-3，（x＜-3）\\ 2，（-3≤x＜0）\\ x+2，（x≥0）\end{array}\right.$
+$\left\{\begin{array}{l}{a_1}=0\\{a_{n+1}}=\frac{{1+{a_n}}}{{3-{a_n}}}（n∈{N^*}）\end{array}\right.$
+$\left\{\begin{array}{l}x+y≤1\\ y≤x\\ y≥-2\end{array}\right.$
+$\left\{{\begin{array}{l}{x≥0}\\{y≥0}\\{x+y≤4}\\{y+2x≤4}\end{array}}\right.$
+$\left\{\begin{array}{l}{a_n}=\frac{3}{4}{a_{n-1}}+\frac{1}{4}{b_{n-1}}+1\\{b_n}=\frac{1}{4}{a_{n-1}}+\frac{3}{4}{b_{n-1}}+1\end{array}\right.$
+$\left\{\begin{array}{l}{x=1+2t}\\{y=a{t}^{2}}\end{array}\right.$
+$\left\{{\begin{array}{l}{ax+by=1}\\{{x^2}+{y^2}=10}\end{array}}\right.$
+$\left\{\begin{array}{l}x+y-3≤0\\ x-y-1≤0\\ x-1≥0\end{array}\right.$
+$\overrightarrow{OP}$
+$\overrightarrow{OA}$
+$\left\{\begin{array}{l}x≥0\\ x≤y\\ x+2y≤3\end{array}\right.$
+$\left\{\begin{array}{l}x-y+2≥0\\ 4x-y-4≤0\\ x≥0\\ y≥0\end{array}\right.$
+$\frac{9}{4}$
+$\left\{\begin{array}{l}x=t\\ y=1+t\end{array}\right.$
+$\left\{\begin{array}{l}{x-y+2≥0}\\{x+y-4≥0}\\{2x-y-5≤0}\end{array}\right.$
+$\left\{\begin{array}{l}{x=4+2cosθ}\\{y=2sinθ}\end{array}\right.$
+$\left\{\begin{array}{l}{x≥0}\\{y≥0}\\{y≤-kx+4k}\end{array}\right.$
+$\frac{ks}{k-1}$
+$\left\{\begin{array}{l}x≥0\\ x≥y\\ 2x-y≤1\end{array}\right.$
+$\frac{3}{2}$
+$\left\{\begin{array}{l}{x≥-1}\\{x+2y≥3}\\{2x+y≤3}\end{array}\right.$
+$\frac{3}{2}$
+$\left\{\begin{array}{l}{4x-4（x≤1）}\\{{x}^{2}-4x+3（x＞1）}\end{array}\right.$
+$\left\{\begin{array}{l}x-4y≤-3\\ 3x+5y≤25\\ x≥1\end{array}\right.$
+$\left\{\begin{array}{l}x≤y≤3x\\ 0≤y≤a\\ x、y∈N\end{array}\right.$
+$\left\{\begin{array}{l}{y≥0}\\{x-y≥0}\\{2x-y-2≥0}\end{array}\right.$
+$\left\{\begin{array}{l}{y≥0}\\{x-y≥0}\\{2x-y-2≥0}\end{array}\right.$
+$\frac{y-1}{x+1}$
+$\frac{1}{2}$
+$\frac{1}{3}$
+$\frac{1}{3}$
+$\frac{1}{2}$
+$\left\{\begin{array}{l}{3≤2x+y≤9}\\{6≤x-y≤9}\end{array}\right.$
+$\left\{\begin{array}{l}{\frac{2}{|x-4|}（x≠4）}\\{a\;\;\;\;\;\;\;\;（x=4）}\end{array}\right.$
+$\left\{\begin{array}{l}x-4y+3≤0\\ 3x+5y＜25\\ x≥1\end{array}\right.$
+$\left\{\begin{array}{l}x≥0{，_{\;}}y≥0\\ 2x+y-1≤0\end{array}\right.$
+$\overrightarrow{OM}?\overrightarrow{ON}$
+$\frac{1}{2}$
+$\left\{{\begin{array}{l}2x-y≤2\\ x-y≥-1\\ x+y≥1\end{array}}\right.$
+$\left\{\begin{array}{l}{ab，ab≤0}\\{-\frac{a}{b}，ab＞0}\end{array}\right.$
+$\frac{1}{x}$
+${（\frac{1}{2}）}^{x}$
+$\left\{\begin{array}{l}x+y≤1\\ y≤x\\ y≥0\end{array}\right.$

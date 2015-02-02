@@ -152,6 +152,8 @@ void CmdMinipage(int code);
 
 extern int  g_processing_list_environment;
 
+void CmdBeginEnd(int code);
+void CmdEndParagraph(int code);
 void CmdIgnoreEnviron(int code);
 void CmdFigure(int code);
 void CmdSubFigure(int code);

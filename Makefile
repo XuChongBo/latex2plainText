@@ -1,4 +1,4 @@
-CC?=gcc
+CC=gcc  # c language
 RM?=rm -f
 MKDIR?=mkdir -p
 RMDIR?=rm -rf

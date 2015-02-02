@@ -35,7 +35,7 @@ Authors:
 //#include "chars.h"
 #include "utils.h"
 //#include "parser.h"
-#include "vertical.h"
+//#include "vertical.h"
 
 
 static int iEnvCount = 0;               /* number of current environments */

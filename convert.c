@@ -26,9 +26,9 @@ This file is available from http://sourceforge.net/projects/latex2rtf/
 #include <stdio.h>
 #include "stack.h"
 #include "utils.h"
+#include "funct1.h"
 #include "convert.h"
 //#include "chars.h"
-#include "vertical.h"
 #include "commands.h"
 #include "parser.h"
 #include "equations.h"
@@ -192,8 +192,8 @@ purpose: converts inputfile and writes result to outputfile
             //just rewrite the unicode.
             char utf8_code[7];
             utf8_code[0]=cThis;
-
-            for (int i=1; i<=len; i++) {
+            int i;
+            for (i=1; i<=len; i++) {
                 cThis = getTexChar();
                 utf8_code[i]=cThis;
                 
@@ -507,7 +507,7 @@ purpose: converts inputfile and writes result to outputfile
                     fprintRTF(";");
                 break;
 
-            case ',':
+            //case ',':
             
                 // if (g_field_separator == ',' && processing_fields()) {
                 //     if (g_processing_arrays) {
@@ -526,7 +526,7 @@ purpose: converts inputfile and writes result to outputfile
                 //         ungetTexChar(cNext);
                 //     }
                 // }
-                break;
+                //break;
 
             default:
                 // if (getTexMode() == MODE_MATH || getTexMode() == MODE_DISPLAYMATH) {

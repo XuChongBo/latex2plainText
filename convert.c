@@ -268,7 +268,7 @@ purpose: converts inputfile and writes result to outputfile
                     cNext = getNonSpace();
 
                     if (cNext == '\n') {    /* new paragraph ... skip all ' ' and '\n' */
-                        CmdEndParagraph(0);
+                        //CmdEndParagraph(0);
 
                     } else {    /* add a space if needed */
                         ungetTexChar(cNext);

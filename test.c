@@ -180,9 +180,12 @@ int main(int argc, char **argv)
         char strLine[1024];  //the buffer for text line.
         int i=0;
         while(!feof(caseFile)){
-            fgets(strLine, 1024,caseFile);
-            if(strlen(strLine)<2)
-                continue;
+            if(!fgets(strLine, 1024,caseFile)){
+                break;
+            }
+        
+            //if(strlen(strLine)<2)
+            //    continue;
             //printf("1-%s",strLine);
             i++;
             int isOK = ConvertTheEquationString(strLine,output_str);

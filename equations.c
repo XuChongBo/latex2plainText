@@ -1012,9 +1012,10 @@ parameter: 0=\lim, 1=\limsup, 2=\liminf
     // } else {
         fprintRTF("%s ", s);
         if (lower_limit) {
-            fprintRTF("{\\dn%d\\fs%d ", script_shift(), script_size());
+            //fprintRTF("{\\dn%d\\fs%d ", script_shift(), script_size());
             ConvertString(lower_limit);
-            fprintRTF("}");
+            //fprintRTF("}");
+            fprintRTF(" ");
         }
 
     //}
